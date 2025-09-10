@@ -1,240 +1,195 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
-  <!-- iPhone WebApp full screen -->
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="Abdos30">
-  <title>Abdos en 30 jours</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Journal d’humeur</title>
   <style>
-    :root{
-      --bg1:#070b12; --bg2:#05080d; --panel:#0b111a; --panel2:#0a131d; --text:#eaf1ff; --muted:#9bb0c9; --accent:#6dd6ff; --accent2:#9bff9b; --warn:#ffd166; --danger:#ff6d83; --ok:#84f5a7; --border:#1b2432;
-      --radius:18px; --shadow:0 16px 36px rgba(0,0,0,.45), inset 0 1px 0 rgba(255,255,255,.04);
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      margin: 0;
+      background: #f9f9fb;
+      color: #333;
     }
-    *{box-sizing:border-box;-webkit-user-select:none;user-select:none}
-    html,body{height:100%}
-    body{margin:0;background:radial-gradient(1200px 900px at 50% -20%, #0b1830, var(--bg1) 50%, var(--bg2));color:var(--text);font-family:System-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Arial,sans-serif;overflow:hidden;-webkit-tap-highlight-color:transparent}
-
-    .app{max-width:460px;margin:0 auto;min-height:100dvh;display:grid;grid-template-rows:auto 1fr auto;gap:12px;padding:14px}
-    header{display:flex;align-items:center;justify-content:space-between;background:linear-gradient(180deg,#121b2b,#0d1522);border:1px solid var(--border);border-radius:16px;box-shadow:var(--shadow);padding:10px 12px}
-    .title{display:flex;gap:8px;align-items:center;font-weight:900}
-    .badge{font-size:12px;border:1px solid var(--border);background:#0e1726;color:var(--muted);padding:6px 8px;border-radius:999px}
-    .chip{border:1px solid var(--border);background:#0f1622;border-radius:999px;padding:6px 8px;color:var(--muted)}
-
-    main{display:grid;gap:12px}
-    .panel{background:linear-gradient(180deg,var(--panel),var(--panel2));border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:14px}
-
-    /* Calendar */
-    .calendar{display:grid;grid-template-columns:repeat(7,1fr);gap:8px}
-    .day{aspect-ratio:1/1;border:1px solid var(--border);border-radius:12px;background:#0a121c;display:grid;place-items:center;color:var(--muted);position:relative}
-    .day.done{background:linear-gradient(180deg,#0e1f2e,#0b1623);color:var(--ok)}
-    .day.today{outline:2px solid var(--accent)}
-    .day span{font-weight:800}
-    .day small{position:absolute;bottom:6px;left:50%;transform:translateX(-50%);font-size:10px;color:var(--muted)}
-
-    /* Workout card */
-    .workout{display:grid;gap:10px}
-    .row{display:flex;gap:8px;align-items:center;justify-content:space-between;flex-wrap:wrap}
-    .select{border:1px solid var(--border);background:#0f1622;color:var(--text);padding:8px 10px;border-radius:10px}
-
-    .exercise{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center;border:1px solid var(--border);background:#0a111a;border-radius:12px;padding:10px}
-    .exercise .name{font-weight:800}
-    .exercise .meta{font-size:12px;color:var(--muted)}
-    .exercise .goal{font-weight:800;color:var(--accent2)}
-    .controls{display:flex;gap:8px;align-items:center;justify-content:center}
-    .btn{appearance:none;border:1px solid var(--border);background:linear-gradient(180deg,#1f2c42,#162233);color:var(--text);border-radius:12px;padding:10px 12px;box-shadow:var(--shadow);font-weight:800}
-    .btn:active{transform:translateY(1px)}
-
-    /* Timer */
-    .timer{display:grid;gap:6px;place-items:center}
-    .clock{width:140px;height:140px;border-radius:999px;border:8px solid #132235;display:grid;place-items:center;background:radial-gradient(circle at 50% 40%, #0f1a29, #0a121b)}
-    .clock > div{font-size:26px;font-weight:900}
-    .hint{font-size:12px;color:var(--muted)}
-
-    /* Footer */
-    nav{display:flex;gap:10px}
-    .big{flex:1;height:56px;border:1px solid var(--border);border-radius:16px;background:linear-gradient(180deg,#163149,#0d1b2a);box-shadow:var(--shadow);display:grid;place-items:center;font-weight:900}
-
-    .toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);background:rgba(8,14,22,.9);border:1px solid var(--border);border-radius:12px;padding:8px 12px;display:none;z-index:20}
-    .toast.show{display:block}
-
-    .overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);display:none;align-items:center;justify-content:center;z-index:30;padding:16px}
-    .modal{max-width:420px;width:100%;background:linear-gradient(180deg,#0e1e2a,#0a141d);border:1px solid var(--border);border-radius:16px;box-shadow:var(--shadow);padding:14px}
-    .field{display:flex;align-items:center;justify-content:space-between;border:1px solid var(--border);background:#0c1822;border-radius:12px;padding:10px;margin:8px 0}
-    .field input, .field select{background:transparent;border:none;color:var(--text);text-align:right;width:120px;font-size:16px;outline:none}
+    header {
+      background: #007aff;
+      color: white;
+      text-align: center;
+      padding: 1rem;
+      font-size: 1.2rem;
+      font-weight: bold;
+    }
+    main {
+      padding: 1rem;
+      max-width: 500px;
+      margin: auto;
+    }
+    textarea {
+      width: 100%;
+      height: 100px;
+      border-radius: 12px;
+      border: 1px solid #ccc;
+      padding: 10px;
+      font-size: 1rem;
+      resize: none;
+    }
+    .smileys {
+      margin: 1rem 0;
+      text-align: center;
+    }
+    .smileys span {
+      font-size: 2rem;
+      cursor: pointer;
+      margin: 0 8px;
+      transition: transform 0.2s;
+    }
+    .smileys span:hover {
+      transform: scale(1.2);
+    }
+    .smileys .selected {
+      border-bottom: 3px solid #007aff;
+    }
+    button {
+      background: #007aff;
+      color: white;
+      border: none;
+      border-radius: 12px;
+      padding: 0.8rem 1.2rem;
+      font-size: 1rem;
+      cursor: pointer;
+      width: 100%;
+      margin-top: 0.5rem;
+    }
+    section {
+      margin-top: 2rem;
+    }
+    .entry {
+      background: white;
+      border-radius: 12px;
+      padding: 1rem;
+      margin-bottom: 1rem;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    canvas {
+      margin-top: 1rem;
+      width: 100% !important;
+      height: 200px !important;
+    }
   </style>
 </head>
 <body>
-  <div class="app">
-    <header>
-      <div class="title">💪 Abdos 30 jours <span class="badge">iPhone WebApp</span></div>
-      <div class="chip">Streak: <b id="streak">0</b> 🔥</div>
-    </header>
-
-    <main>
-      <section class="panel">
-        <div class="row" style="margin-bottom:8px">
-          <div class="chip">Jour: <b id="dayLbl">1</b>/30</div>
-          <div class="chip">Difficulté: <b id="diffLbl">Normal</b></div>
-          <button class="btn" id="btnSettings">Réglages</button>
-        </div>
-        <div class="calendar" id="cal"></div>
-      </section>
-
-      <section class="panel workout">
-        <div class="row">
-          <div style="font-weight:900">Séance du jour</div>
-          <div class="chip">Repos: <b id="restLbl">30</b>s</div>
-        </div>
-        <div id="list"></div>
-        <div class="timer">
-          <div class="clock"><div id="clock">00:30</div></div>
-          <div class="controls">
-            <button class="btn" id="btnStart">▶️ Démarrer</button>
-            <button class="btn" id="btnPause">⏸️ Pause</button>
-            <button class="btn" id="btnSkip">⏭️ Suivant</button>
-          </div>
-          <div class="hint">Le minuteur sert pour le repos entre les séries • Tu peux l'ajuster dans les réglages</div>
-        </div>
-      </section>
-    </main>
-
-    <nav>
-      <button class="big" id="btnDone">✔️ Marquer le jour comme terminé</button>
-    </nav>
-  </div>
-
-  <!-- Réglages -->
-  <div class="overlay" id="ov">
-    <div class="modal">
-      <button class="btn" id="btnClose" style="float:right">✕</button>
-      <h3>Réglages</h3>
-      <div class="field"><span>Difficulté</span>
-        <select id="diffSel">
-          <option value="easy">Facile</option>
-          <option value="normal" selected>Normal</option>
-          <option value="hard">Difficile</option>
-        </select>
-      </div>
-      <div class="field"><span>Repos entre séries</span><input id="restInput" type="number" min="10" max="180" step="5" value="30"> s</div>
-      <div class="field"><span>Réinitialiser le programme</span><button class="btn" id="btnReset">Remettre à 0</button></div>
-      <div class="field"><span>Exporter progression</span><button class="btn" id="btnExport">JSON</button></div>
-      <div class="field"><span>Importer progression</span><button class="btn" id="btnImport">JSON</button></div>
+  <header>📔 Journal d’humeur</header>
+  <main>
+    <h2>Nouvelle entrée</h2>
+    <textarea id="journalText" placeholder="Écris ta journée..."></textarea>
+    <div class="smileys" id="smileys">
+      <span data-value="1">😢</span>
+      <span data-value="2">😔</span>
+      <span data-value="3">😐</span>
+      <span data-value="4">🙂</span>
+      <span data-value="5">😃</span>
     </div>
-  </div>
+    <button onclick="saveEntry()">Enregistrer</button>
 
-  <div class="toast" id="toast"></div>
+    <section>
+      <h2>Historique</h2>
+      <div id="entries"></div>
+    </section>
 
-<script>
-// ===== Helpers
-const $=s=>document.querySelector(s);
-const fmt2 = n=> String(n).padStart(2,'0');
-function toast(msg){ const t=$('#toast'); t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),1200); }
-const todayKey = ()=> new Date().toISOString().slice(0,10);
+    <section>
+      <h2>Statistiques</h2>
+      <canvas id="statsChart"></canvas>
+    </section>
+  </main>
 
-// ===== Program model (base reps per day for Normal)
-const BASE = [
-  {name:'Crunchs', base:12},
-  {name:'Relevés de jambes', base:8},
-  {name:'Gainage (sec)', base:25, hold:true},
-  {name:'Bicycle crunch', base:10},
-  {name:'Mountain climbers', base:20}
-];
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script>
+    const textArea = document.getElementById("journalText");
+    const smileys = document.getElementById("smileys");
+    const entriesDiv = document.getElementById("entries");
+    const chartCtx = document.getElementById("statsChart").getContext("2d");
 
-// scale rules by day and difficulty
-function dayMultiplier(day){ // gentle ramp
-  return 0.8 + (day-1)*(0.2/9) * (day<=10?1: day<=20? 0.7:0.5); // fast first 10 days then slower
-}
-function diffMultiplier(diff){ return diff==='easy'?0.8 : diff==='hard'?1.25 : 1; }
+    let selectedMood = null;
+    let chart;
 
-// ===== State
-const KEY='abs30.v1';
-let state = { day:1, diff:'normal', rest:30, done:{}, streak:0, lastDone:'' };
+    // Sélection smiley
+    smileys.addEventListener("click", e => {
+      if (e.target.dataset.value) {
+        selectedMood = parseInt(e.target.dataset.value);
+        [...smileys.children].forEach(s => s.classList.remove("selected"));
+        e.target.classList.add("selected");
+      }
+    });
 
-function save(){ localStorage.setItem(KEY, JSON.stringify(state)); }
-function load(){ try{ const s=JSON.parse(localStorage.getItem(KEY)||'null'); if(s) state=s; }catch{}
-  if(state.day<1||state.day>30) state.day=1; state.done ||= {}; state.diff ||= 'normal'; state.rest ||= 30; state.streak ||= 0; state.lastDone ||= '';
-}
-load();
+    function saveEntry() {
+      const text = textArea.value.trim();
+      if (!text || !selectedMood) {
+        alert("Écris quelque chose et choisis un smiley !");
+        return;
+      }
 
-// ===== Build daily plan
-function buildPlan(day){
-  const mult = dayMultiplier(day) * diffMultiplier(state.diff);
-  return BASE.map(x=> ({ name:x.name, reps: Math.max( (x.hold? Math.round(x.base*mult) : Math.round(x.base*mult)), x.hold?15:8 ), hold:!!x.hold, sets: day<=10? 3 : day<=20? 4 : 5 }));
-}
+      const entry = {
+        text,
+        mood: selectedMood,
+        date: new Date().toLocaleString()
+      };
 
-// ===== Calendar
-function renderCal(){
-  const cal=$('#cal'); cal.innerHTML='';
-  for(let i=1;i<=30;i++){
-    const d = document.createElement('div'); d.className='day'+(i===state.day?' today':'')+(state.done[i]?' done':'');
-    d.innerHTML = `<span>${i}</span><small>${state.done[i]? '✔️' : ''}</small>`;
-    d.onclick = ()=>{ state.day=i; renderAll(); save(); };
-    cal.appendChild(d);
-  }
-}
+      const entries = JSON.parse(localStorage.getItem("journalEntries")) || [];
+      entries.unshift(entry); // ajoute en haut
+      localStorage.setItem("journalEntries", JSON.stringify(entries));
 
-// ===== Workout list
-let currentIndex=0; let timer=0; let running=false; let paused=false; let plan=buildPlan(state.day);
-function renderList(){
-  plan = buildPlan(state.day);
-  const list=$('#list'); list.innerHTML='';
-  plan.forEach((ex,idx)=>{
-    const row=document.createElement('div'); row.className='exercise';
-    const left=document.createElement('div'); left.innerHTML = `<div class="name">${ex.name}</div><div class="meta">${ex.sets} séries</div>`;
-    const right=document.createElement('div'); right.innerHTML = `<span class="goal">${ex.hold? ex.reps+'s' : ex.reps+' reps'}</span>`;
-    if(idx===currentIndex) row.style.outline='2px solid var(--accent)';
-    row.appendChild(left); row.appendChild(right); list.appendChild(row);
-  });
-}
+      textArea.value = "";
+      selectedMood = null;
+      [...smileys.children].forEach(s => s.classList.remove("selected"));
 
-// ===== Timer (rest)
-function setClock(sec){ $('#clock').textContent = `${fmt2(Math.floor(sec/60))}:${fmt2(Math.floor(sec%60))}`; }
-setClock(state.rest);
+      loadEntries();
+      updateChart();
+    }
 
-function start(){ if(running) return; running=true; paused=false; timer = state.rest; tick(); }
-function pause(){ paused=!paused; }
-function skip(){ timer=0; }
+    function loadEntries() {
+      const entries = JSON.parse(localStorage.getItem("journalEntries")) || [];
+      entriesDiv.innerHTML = "";
+      entries.forEach(e => {
+        const div = document.createElement("div");
+        div.classList.add("entry");
+        div.innerHTML = `<strong>${e.date}</strong><br>${e.text}<br><span style="font-size:1.5rem">${getSmiley(e.mood)}</span>`;
+        entriesDiv.appendChild(div);
+      });
+    }
 
-function tick(){ if(!running) return; if(paused) { setTimeout(tick,250); return; }
-  setClock(timer); if(timer<=0){ nextExercise(); return; } timer -= 1; setTimeout(tick,1000); }
+    function getSmiley(mood) {
+      switch (mood) {
+        case 1: return "😢";
+        case 2: return "😔";
+        case 3: return "😐";
+        case 4: return "🙂";
+        case 5: return "😃";
+      }
+    }
 
-function nextExercise(){
-  currentIndex++; if(currentIndex>=plan.length){
-    toast('Séance terminée — bravo !'); running=false; return; }
-  // after rest, highlight next
-  renderList(); timer = state.rest; tick();
-}
+    function updateChart() {
+      const entries = JSON.parse(localStorage.getItem("journalEntries")) || [];
+      const counts = [0,0,0,0,0];
+      entries.forEach(e => counts[e.mood-1]++);
 
-// ===== Mark day done
-function markDone(){
-  state.done[state.day]=true; // streak
-  const today = todayKey();
-  if(state.lastDone){ const prev = new Date(state.lastDone); const now = new Date(today); const diff = (now - prev)/(1000*3600*24);
-    if(diff<=1.1) state.streak++; else state.streak=1;
-  } else state.streak=1;
-  state.lastDone = today; save(); renderAll(); toast('Jour validé ✔️');
-  if(state.day<30) { state.day++; currentIndex=0; renderAll(); }
-}
+      if (chart) chart.destroy();
+      chart = new Chart(chartCtx, {
+        type: "bar",
+        data: {
+          labels: ["😢","😔","😐","🙂","😃"],
+          datasets: [{
+            label: "Nombre de jours",
+            data: counts,
+            backgroundColor: "#007aff"
+          }]
+        },
+        options: { responsive: true, scales: { y: { beginAtZero: true } } }
+      });
+    }
 
-// ===== Settings
-$('#btnSettings').onclick = ()=> $('#ov').style.display='flex';
-$('#btnClose').onclick = ()=> $('#ov').style.display='none';
-$('#btnReset').onclick = ()=>{ if(confirm('Réinitialiser le programme ?')){ state.day=1; state.done={}; state.streak=0; state.lastDone=''; currentIndex=0; save(); renderAll(); } };
-$('#diffSel').value = state.diff; $('#diffSel').onchange = e=>{ state.diff=e.target.value; $('#diffLbl').textContent = e.target.options[e.target.selectedIndex].text; save(); renderAll(); };
-$('#restInput').value = state.rest; $('#restInput').onchange = e=>{ const v=Math.max(10, Math.min(180, +e.target.value||30)); state.rest=v; $('#restLbl').textContent=v; setClock(v); save(); };
-
-// Export/Import
-$('#btnExport').onclick = ()=>{ const blob=new Blob([JSON.stringify(state,null,2)],{type:'application/json'}); const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download='abdos30.json'; a.click(); URL.revokeObjectURL(url); };
-$('#btnImport').onclick = ()=>{ const inp=document.createElement('input'); inp.type='file'; inp.accept='.json,application/json'; inp.onchange=()=>{ const f=inp.files[0]; if(!f) return; const r=new FileReader(); r.onload=()=>{ try{ const s=JSON.parse(r.result); if(s && s.done && s.day){ state=s; save(); renderAll(); toast('Import réussi'); } }catch{ toast('Erreur import'); } }; r.readAsText(f); }; inp.click(); };
-
-// Buttons
-$('#btnStart').onclick = start; $('#btnPause').onclick = pause; $('#btnSkip').onclick = skip; $('#btnDone').onclick = markDone;
-
-function renderAll(){ $('#dayLbl').textContent=state.day; $('#restLbl').textContent=state.rest; $('#diffLbl').textContent = state.diff==='easy'?'Facile': state.diff==='hard'?'Difficile':'Normal'; $('#streak').textContent=state.streak; renderCal(); renderList(); setClock(state.rest); }
-renderAll();
-</script>
+    // Init
+    loadEntries();
+    updateChart();
+  </script>
 </body>
 </html>
