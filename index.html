@@ -1,30 +1,281 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-
-  <!-- Balises pour iOS WebApp -->
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+  <!-- iPhone WebApp full screen -->
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="Bonjour">
-
-  <title>Bonjour iPhone</title>
+  <meta name="apple-mobile-web-app-title" content="Checklist">
+  <title>Checklist — iPhone WebApp</title>
   <style>
-    body {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      height: 100vh;
-      margin: 0;
-      background: #0b0f14;
-      color: #eaf1ff;
-      font-family: sans-serif;
-      font-size: 2.5rem;
+    :root{
+      --bg:#0b0f14;--panel:#101826;--panel2:#0c1421;--text:#eaf1ff;--muted:#9bb0c9;--accent:#6dd6ff;--ok:#9bff9b;--danger:#ff6d83;--warn:#ffd166;--border:#1b2432;--shadow:0 10px 24px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.04);
+      --radius:18px;--radius-sm:12px
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{margin:0;background:radial-gradient(1200px 800px at 10% 0%, #0a111b 0%, #0b0f14 50%, #090e13 100%);color:var(--text);font-family:System-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,'Helvetica Neue',Arial,'Noto Sans',sans-serif;-webkit-tap-highlight-color: transparent;}
+    .app{max-width:860px;margin:0 auto;padding:18px;display:grid;gap:14px}
+    header{position:sticky;top:0;z-index:5;background:linear-gradient(180deg,#121b2b,#0d1522);border-bottom:1px solid var(--border);box-shadow:0 6px 20px rgba(0,0,0,.25);padding:10px 12px;border-radius:0 0 var(--radius) var(--radius)}
+    .row{display:flex;gap:8px;align-items:center}
+    .title{font-size:20px;font-weight:800;letter-spacing:.3px}
+    .badge{font-size:12px;border:1px solid var(--border);background:#0e1726;color:var(--muted);padding:6px 8px;border-radius:999px}
+    .search{flex:1;display:flex;gap:8px}
+    .search input{flex:1;border-radius:12px;border:1px solid var(--border);background:#0f1622;color:var(--text);padding:10px 12px;outline:none}
+
+    .panel{background:linear-gradient(180deg,var(--panel),var(--panel2));border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:12px}
+    .stats{display:flex;gap:10px;flex-wrap:wrap;color:var(--muted);font-size:13px}
+
+    .new{display:flex;gap:8px}
+    .new input, .new select{border-radius:12px;border:1px solid var(--border);background:#0f1622;color:var(--text);padding:10px 12px;outline:none}
+    .new input[type="date"]{padding:9px 10px}
+    .btn{appearance:none;border:none;border-radius:12px;padding:10px 12px;background:linear-gradient(180deg,#1f2c42,#162233);border:1px solid #263247;color:var(--text);cursor:pointer;box-shadow:var(--shadow);font-weight:700}
+    .btn:disabled{opacity:.6}
+
+    .toolbar{display:flex;gap:8px;flex-wrap:wrap}
+    .filter .btn{opacity:.85}
+    .filter .btn.active{outline:2px solid var(--accent)}
+
+    .list{display:flex;flex-direction:column;gap:8px}
+    .item{display:grid;grid-template-columns: 28px 1fr auto;gap:10px;align-items:center;border:1px solid var(--border);background:linear-gradient(180deg,#0d1522,#0a111a);border-radius:14px;padding:10px;touch-action:manipulation}
+    .item.done{opacity:.7}
+    .handle{cursor:grab;font-size:18px;opacity:.6}
+    .checkbox{width:22px;height:22px;border:1px solid var(--border);border-radius:6px;background:#0f1622;display:inline-grid;place-items:center}
+    .checkbox input{appearance:none;width:100%;height:100%;margin:0;border-radius:6px}
+    .checkbox input:checked{background:linear-gradient(180deg,#184e35,#0e3021);border:1px solid #20563d}
+
+    .content{display:flex;flex-direction:column}
+    .titleline{display:flex;gap:8px;align-items:center}
+    .titleline input[type="text"]{flex:1;background:transparent;border:none;outline:none;color:var(--text);font-weight:700}
+    .meta{font-size:12px;color:var(--muted);display:flex;gap:10px;flex-wrap:wrap}
+    .chip{border:1px solid var(--border);background:#0f1622;border-radius:999px;padding:4px 6px}
+
+    .actions{display:flex;gap:6px}
+    .iconbtn{appearance:none;border:1px solid var(--border);background:#0f1622;border-radius:10px;padding:8px;cursor:pointer;color:var(--muted)}
+    .iconbtn:hover{color:var(--text)}
+
+    .empty{padding:18px;text-align:center;color:var(--muted)}
+
+    .toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);background:rgba(16,24,38,.9);border:1px solid var(--border);border-radius:12px;padding:8px 12px;display:none}
+    .toast.show{display:block}
+
+    @media (max-width:760px){
+      .new{flex-direction:column}
+      .new .row{width:100%}
     }
   </style>
 </head>
 <body>
-  👋 Bonjour iPhone 🚀
+  <div class="app">
+    <header>
+      <div class="row" style="justify-content:space-between">
+        <div class="row">
+          <div class="title">Checklist</div>
+          <span class="badge">iPhone WebApp</span>
+          <span class="badge" id="badgeCount">0 tâches</span>
+        </div>
+        <div class="search">
+          <input id="q" type="search" placeholder="Rechercher… (titre, tag)" />
+          <button class="btn" id="btnExport" title="Exporter JSON">Exporter</button>
+          <button class="btn" id="btnImport" title="Importer JSON">Importer</button>
+        </div>
+      </div>
+    </header>
+
+    <section class="panel">
+      <div class="new">
+        <input id="newTitle" type="text" placeholder="Nouvelle tâche…" />
+        <input id="newDate" type="date" />
+        <select id="newTag">
+          <option value="">Tag</option>
+          <option>Perso</option>
+          <option>École</option>
+          <option>Projet</option>
+        </select>
+        <button class="btn" id="btnAdd">Ajouter</button>
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-top:10px">
+        <div class="toolbar filter">
+          <button class="btn active" data-filter="all">Toutes</button>
+          <button class="btn" data-filter="open">À faire</button>
+          <button class="btn" data-filter="done">Terminées</button>
+          <button class="btn" data-filter="today">Aujourd'hui</button>
+          <button class="btn" data-filter="late">En retard</button>
+        </div>
+        <div class="toolbar">
+          <button class="btn" id="btnSort">Trier: Automatique</button>
+          <button class="btn" id="btnClear">Supprimer terminées</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel">
+      <div id="list" class="list"></div>
+      <div id="empty" class="empty">Rien ici. Ajoute une tâche ci-dessus ↑</div>
+    </section>
+
+    <section class="panel stats" id="stats"></section>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+<script>
+// ===== Utils
+const $ = s=>document.querySelector(s);
+const el = (t,cls)=>{const e=document.createElement(t);if(cls)e.className=cls;return e};
+const fmtDate = (d)=> d? new Date(d).toLocaleDateString('fr-FR',{year:'2-digit',month:'2-digit',day:'2-digit'}) : '—';
+const todayStr = ()=> new Date().toISOString().slice(0,10);
+function toast(m){ const t=$('#toast'); t.textContent=m; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),1200); }
+
+// ===== State
+let state = { sort:'auto', filter:'all', q:'', items:[] };
+const KEY='checklist.v1';
+
+function save(){ localStorage.setItem(KEY, JSON.stringify(state)); }
+function load(){ try{ const s=JSON.parse(localStorage.getItem(KEY)||'null'); if(s) state=s; }catch{} }
+
+// ===== Items ops
+function addItem(title, date, tag){
+  title = (title||'').trim(); if(!title) return toast('Titre vide');
+  const it = { id: crypto.randomUUID(), title, done:false, date: date||'', tag: (tag||'').trim() };
+  state.items.unshift(it); save(); render(); }
+
+function toggleDone(id){ const it=state.items.find(x=>x.id===id); if(!it) return; it.done=!it.done; save(); render(); }
+function removeItem(id){ state.items = state.items.filter(x=>x.id!==id); save(); render(); }
+function clearDone(){ const n=state.items.filter(x=>x.done).length; state.items = state.items.filter(x=>!x.done); save(); render(); toast(`Supprimé ${n} ✔️`); }
+function updateTitle(id, val){ const it=state.items.find(x=>x.id===id); if(!it) return; it.title=val.trim(); save(); render(); }
+function updateDate(id, val){ const it=state.items.find(x=>x.id===id); if(!it) return; it.date=val; save(); render(); }
+function updateTag(id, val){ const it=state.items.find(x=>x.id===id); if(!it) return; it.tag=val.trim(); save(); render(); }
+
+// Drag reorder (desktop + touch)
+let dragId=null; let dragIndex=-1;
+function onDragStart(e,id){ dragId=id; dragIndex = state.items.findIndex(x=>x.id===id); e.dataTransfer?.setData('text/plain', id); e.currentTarget.style.opacity=.5; }
+function onDragEnd(e){ e.currentTarget.style.opacity=''; dragId=null; dragIndex=-1; }
+function onDragOver(e,overId){ e.preventDefault(); if(!dragId || overId===dragId) return; const overIndex = state.items.findIndex(x=>x.id===overId); if(overIndex===-1) return; if(overIndex===dragIndex) return; // swap
+  const tmp = state.items[dragIndex]; state.items.splice(dragIndex,1); state.items.splice(overIndex,0,tmp); dragIndex=overIndex; save(); render(); }
+
+// ===== Filters & sort
+function matchFilter(it){
+  const q = (state.q||'').toLowerCase();
+  const matchesQ = !q || it.title.toLowerCase().includes(q) || (it.tag||'').toLowerCase().includes(q);
+  const due = it.date || '';
+  const today = todayStr();
+  const isLate = !!due && !it.done && due < today;
+  const isToday = !!due && due === today;
+  let ok=true;
+  if(state.filter==='open') ok = !it.done;
+  else if(state.filter==='done') ok = it.done;
+  else if(state.filter==='today') ok = isToday;
+  else if(state.filter==='late') ok = isLate;
+  return matchesQ && ok;
+}
+
+function sortItems(list){
+  if(state.sort==='auto'){
+    // 1) non terminées par date (today -> bientôt -> vides)  2) terminées à la fin
+    return list.slice().sort((a,b)=>{
+      if(a.done!==b.done) return a.done?1:-1;
+      const ad=a.date||'9999-12-31', bd=b.date||'9999-12-31';
+      if(ad!==bd) return ad<bd?-1:1; // plus proche d'abord
+      return a.title.localeCompare(b.title);
+    });
+  } else if(state.sort==='alpha'){
+    return list.slice().sort((a,b)=> a.title.localeCompare(b.title));
+  } else if(state.sort==='manual'){
+    return state.items; // ordre interne (modifiable par drag)
+  }
+  return list;
+}
+
+// ===== Render
+function render(){
+  const listEl = $('#list'); listEl.innerHTML='';
+  const items = sortItems(state.items.filter(matchFilter));
+  $('#badgeCount').textContent = `${state.items.filter(x=>!x.done).length} à faire • ${state.items.length} total`;
+  $('#empty').style.display = items.length? 'none':'block';
+
+  for(const it of items){
+    const row = el('div','item'+(it.done?' done':''));
+    row.setAttribute('draggable', state.sort==='manual');
+    row.ondragstart = (e)=> onDragStart(e,it.id);
+    row.ondragend = onDragEnd;
+
+    const handle = el('div','handle'); handle.textContent='≡'; handle.title='Glisser pour réordonner';
+    const cb = el('label','checkbox'); const cbi = document.createElement('input'); cbi.type='checkbox'; cbi.checked=!!it.done; cbi.onchange=()=>toggleDone(it.id); cb.appendChild(cbi);
+
+    const content = el('div','content');
+    const line = el('div','titleline');
+    const input = document.createElement('input'); input.type='text'; input.value=it.title; input.onchange=()=>updateTitle(it.id,input.value); input.onkeydown=(e)=>{ if(e.key==='Enter') input.blur(); };
+    const tag = document.createElement('input'); tag.type='text'; tag.placeholder='tag'; tag.value=it.tag||''; tag.style.width='90px'; tag.onchange=()=>updateTag(it.id, tag.value);
+    line.appendChild(input); line.appendChild(tag);
+
+    const meta = el('div','meta');
+    const date = document.createElement('input'); date.type='date'; date.value=it.date||''; date.onchange=()=>updateDate(it.id,date.value);
+    const dueChip = el('span','chip');
+    const t=todayStr(); const isLate = !!it.date && !it.done && it.date < t; const isToday = !!it.date && it.date===t;
+    dueChip.textContent = it.date ? (isLate? '⏰ En retard' : (isToday? '📅 Aujourd’hui' : '📌 '+fmtDate(it.date))) : '—';
+    if(isLate) dueChip.style.color='var(--warn)';
+    meta.append('Échéance:', date, dueChip);
+
+    content.append(line, meta);
+
+    const actions = el('div','actions');
+    const del = el('button','iconbtn'); del.title='Supprimer'; del.textContent='🗑'; del.onclick=()=>removeItem(it.id);
+    actions.append(del);
+
+    row.append(handle, cb, content, actions);
+
+    // allow dropping anywhere within the list
+    row.ondragover = (e)=> onDragOver(e,it.id);
+
+    listEl.appendChild(row);
+  }
+
+  // Stats
+  const open = state.items.filter(x=>!x.done).length; const done = state.items.length - open; const late = state.items.filter(x=>!x.done && x.date && x.date<todayStr()).length; const today = state.items.filter(x=>!x.done && x.date===todayStr()).length;
+  $('#stats').innerHTML = `
+    <span class="chip">À faire: <b>${open}</b></span>
+    <span class="chip">Terminées: <b>${done}</b></span>
+    <span class="chip">Aujourd'hui: <b>${today}</b></span>
+    <span class="chip">En retard: <b>${late}</b></span>
+    <span class="chip">Tri: <b>${state.sort}</b></span>
+    <span class="chip">Filtre: <b>${state.filter}</b></span>`;
+}
+
+// ===== Events
+$('#btnAdd').onclick = ()=>{ addItem($('#newTitle').value, $('#newDate').value, $('#newTag').value); $('#newTitle').value=''; };
+$('#btnClear').onclick = clearDone;
+$('#btnSort').onclick = ()=>{
+  state.sort = state.sort==='auto' ? 'alpha' : state.sort==='alpha' ? 'manual' : 'auto';
+  $('#btnSort').textContent = 'Trier: ' + (state.sort==='auto'?'Automatique': state.sort==='alpha'?'Alphabétique':'Manuel');
+  save(); render();
+};
+
+document.querySelectorAll('[data-filter]').forEach(b=> b.onclick = ()=>{
+  document.querySelectorAll('[data-filter]').forEach(x=>x.classList.remove('active'));
+  b.classList.add('active'); state.filter=b.dataset.filter; save(); render();
+});
+
+$('#q').oninput = (e)=>{ state.q = e.target.value; render(); };
+
+// Export/Import JSON (pour sauvegarde/partage)
+$('#btnExport').onclick = ()=>{
+  const blob = new Blob([JSON.stringify(state.items, null, 2)], {type:'application/json'});
+  const url = URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download='checklist.json'; a.click(); URL.revokeObjectURL(url);
+};
+$('#btnImport').onclick = ()=>{
+  const inp = document.createElement('input'); inp.type='file'; inp.accept='.json,application/json';
+  inp.onchange = ()=>{
+    const f=inp.files[0]; if(!f) return; const r=new FileReader(); r.onload=()=>{
+      try{ const arr=JSON.parse(r.result); if(Array.isArray(arr)){ state.items = arr.map(x=>({ id:crypto.randomUUID(), title:String(x.title||''), done:!!x.done, date:x.date||'', tag:String(x.tag||'') })); save(); render(); toast('Import réussi'); } else toast('Fichier invalide'); }
+      catch{ toast('Erreur import'); }
+    }; r.readAsText(f);
+  }; inp.click();
+};
+
+// Init
+load(); render();
+</script>
 </body>
 </html>
