@@ -6,119 +6,122 @@
   <!-- iPhone WebApp full screen -->
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="Hydra">
-  <title>Hydra — Suivi d’eau</title>
+  <meta name="apple-mobile-web-app-title" content="Abdos30">
+  <title>Abdos en 30 jours</title>
   <style>
     :root{
-      --bg1:#051219; --bg2:#020a0f; --panel:#0a1620; --panel2:#07111a; --text:#e9f6ff; --muted:#9dc0d9; --accent:#7be0ff; --accent2:#5cffc5; --warn:#ffd166; --danger:#ff6d83; --ok:#9bff9b; --border:#123041;
-      --glass:#0f2a36; --fill1:#0cb6ff; --fill2:#10e0c8; --bubble:rgba(160,235,255,.85);
-      --radius:20px; --shadow:0 18px 40px rgba(0,0,0,.45), inset 0 1px 0 rgba(255,255,255,.04);
+      --bg1:#070b12; --bg2:#05080d; --panel:#0b111a; --panel2:#0a131d; --text:#eaf1ff; --muted:#9bb0c9; --accent:#6dd6ff; --accent2:#9bff9b; --warn:#ffd166; --danger:#ff6d83; --ok:#84f5a7; --border:#1b2432;
+      --radius:18px; --shadow:0 16px 36px rgba(0,0,0,.45), inset 0 1px 0 rgba(255,255,255,.04);
     }
-    *{box-sizing:border-box} html,body{height:100%}
-    body{margin:0;background:radial-gradient(1200px 900px at 50% -20%, #07233a 0%, var(--bg1) 45%, var(--bg2) 100%);color:var(--text);font-family:System-ui,-apple-system,Segoe UI,Roboto,Ubuntu,'Helvetica Neue',Arial,'Noto Sans',sans-serif;overflow:hidden;-webkit-tap-highlight-color:transparent}
+    *{box-sizing:border-box;-webkit-user-select:none;user-select:none}
+    html,body{height:100%}
+    body{margin:0;background:radial-gradient(1200px 900px at 50% -20%, #0b1830, var(--bg1) 50%, var(--bg2));color:var(--text);font-family:System-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Arial,sans-serif;overflow:hidden;-webkit-tap-highlight-color:transparent}
 
-    /* Layout */
-    .app{position:relative;max-width:460px;margin:0 auto;height:100dvh;display:grid;grid-template-rows:auto 1fr auto;gap:12px;padding:14px}
-    header{display:flex;align-items:center;justify-content:space-between;background:linear-gradient(180deg,#0e1e2a,#09141d);border:1px solid var(--border);border-radius:16px;box-shadow:var(--shadow);padding:10px 12px}
-    .title{display:flex;align-items:center;gap:10px;font-weight:900;letter-spacing:.4px}
-    .badge{font-size:12px;border:1px solid var(--border);background:#0d1b26;color:var(--muted);padding:6px 8px;border-radius:999px}
-    .stats{display:flex;gap:10px;flex-wrap:wrap;color:var(--muted);font-size:13px}
-    .chip{border:1px solid var(--border);background:#0e1c26;border-radius:999px;padding:6px 8px}
+    .app{max-width:460px;margin:0 auto;min-height:100dvh;display:grid;grid-template-rows:auto 1fr auto;gap:12px;padding:14px}
+    header{display:flex;align-items:center;justify-content:space-between;background:linear-gradient(180deg,#121b2b,#0d1522);border:1px solid var(--border);border-radius:16px;box-shadow:var(--shadow);padding:10px 12px}
+    .title{display:flex;gap:8px;align-items:center;font-weight:900}
+    .badge{font-size:12px;border:1px solid var(--border);background:#0e1726;color:var(--muted);padding:6px 8px;border-radius:999px}
+    .chip{border:1px solid var(--border);background:#0f1622;border-radius:999px;padding:6px 8px;color:var(--muted)}
 
-    main{position:relative;display:grid;grid-template-rows:1fr auto;gap:12px}
-    .card{background:linear-gradient(180deg,var(--panel),var(--panel2));border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:14px}
+    main{display:grid;gap:12px}
+    .panel{background:linear-gradient(180deg,var(--panel),var(--panel2));border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:14px}
 
-    /* Bouteille */
-    .bottleWrap{position:relative;height:100%;display:grid;place-items:center;overflow:hidden}
-    .bottle{position:relative;width:min(72vw,320px);aspect-ratio:3/5;filter:drop-shadow(0 18px 40px rgba(12,182,255,.15))}
-    .bottle svg{width:100%;height:100%;display:block}
-    .water{position:absolute;left:8%;right:8%;bottom:10%;height:0;border-radius:0 0 22px 22px;background:linear-gradient(180deg,var(--fill1),var(--fill2));box-shadow:inset 0 6px 16px rgba(255,255,255,.25);overflow:hidden}
-    .water::after{content:"";position:absolute;inset:0;background:radial-gradient(120px 20px at 50% 12px, rgba(255,255,255,.28), transparent 60%), repeating-linear-gradient( -35deg, rgba(255,255,255,.08) 0 8px, rgba(255,255,255,0) 8px 16px );opacity:.8;mix-blend-mode:screen}
-    .surface{position:absolute;left:8%;right:8%;bottom:calc(10% + var(--h));height:16px;border-radius:999px;background:linear-gradient(180deg, rgba(255,255,255,.6), rgba(255,255,255,.05));filter:blur(0.2px);box-shadow:0 6px 18px rgba(16,224,200,.25)}
-    .bubble{position:absolute;width:8px;height:8px;border-radius:999px;background:var(--bubble);opacity:.9;animation:rise 4s linear infinite}
-    @keyframes rise{ from{ transform:translateY(0) scale(.8) } to{ transform:translateY(-180px) scale(1)} }
+    /* Calendar */
+    .calendar{display:grid;grid-template-columns:repeat(7,1fr);gap:8px}
+    .day{aspect-ratio:1/1;border:1px solid var(--border);border-radius:12px;background:#0a121c;display:grid;place-items:center;color:var(--muted);position:relative}
+    .day.done{background:linear-gradient(180deg,#0e1f2e,#0b1623);color:var(--ok)}
+    .day.today{outline:2px solid var(--accent)}
+    .day span{font-weight:800}
+    .day small{position:absolute;bottom:6px;left:50%;transform:translateX(-50%);font-size:10px;color:var(--muted)}
 
-    /* Historique */
-    .history{display:grid;grid-template-columns:repeat(7,1fr);gap:10px}
-    .bar{height:76px;background:linear-gradient(180deg,#0c1a26,#0a131d);border:1px solid var(--border);border-radius:12px;position:relative;overflow:hidden}
-    .bar > div{position:absolute;left:0;right:0;bottom:0;height:0;background:linear-gradient(180deg,var(--fill1),var(--fill2))}
-    .bar label{position:absolute;left:50%;bottom:-22px;transform:translateX(-50%);font-size:11px;color:var(--muted)}
+    /* Workout card */
+    .workout{display:grid;gap:10px}
+    .row{display:flex;gap:8px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+    .select{border:1px solid var(--border);background:#0f1622;color:var(--text);padding:8px 10px;border-radius:10px}
 
-    /* Boutons */
-    .dock{display:flex;gap:12px;justify-content:space-between}
-    .big{flex:1;display:grid;place-items:center;height:64px;border:1px solid var(--border);border-radius:16px;background:linear-gradient(180deg,#163149,#0d1b2a);box-shadow:var(--shadow);font-weight:900;font-size:20px}
-    .big:active{transform:translateY(1px)}
-    .round{width:64px;height:64px;border-radius:999px;border:1px solid var(--border);background:linear-gradient(180deg,#1d3e59,#102232);display:grid;place-items:center;font-weight:900}
+    .exercise{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center;border:1px solid var(--border);background:#0a111a;border-radius:12px;padding:10px}
+    .exercise .name{font-weight:800}
+    .exercise .meta{font-size:12px;color:var(--muted)}
+    .exercise .goal{font-weight:800;color:var(--accent2)}
+    .controls{display:flex;gap:8px;align-items:center;justify-content:center}
+    .btn{appearance:none;border:1px solid var(--border);background:linear-gradient(180deg,#1f2c42,#162233);color:var(--text);border-radius:12px;padding:10px 12px;box-shadow:var(--shadow);font-weight:800}
+    .btn:active{transform:translateY(1px)}
 
-    .ghost{background:transparent;border:1px dashed var(--border)}
+    /* Timer */
+    .timer{display:grid;gap:6px;place-items:center}
+    .clock{width:140px;height:140px;border-radius:999px;border:8px solid #132235;display:grid;place-items:center;background:radial-gradient(circle at 50% 40%, #0f1a29, #0a121b)}
+    .clock > div{font-size:26px;font-weight:900}
+    .hint{font-size:12px;color:var(--muted)}
+
+    /* Footer */
+    nav{display:flex;gap:10px}
+    .big{flex:1;height:56px;border:1px solid var(--border);border-radius:16px;background:linear-gradient(180deg,#163149,#0d1b2a);box-shadow:var(--shadow);display:grid;place-items:center;font-weight:900}
 
     .toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);background:rgba(8,14,22,.9);border:1px solid var(--border);border-radius:12px;padding:8px 12px;display:none;z-index:20}
     .toast.show{display:block}
 
-    /* Modales */
-    .overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);display:none;align-items:center;justify-content:center;z-index:30;padding:16px}
+    .overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);display:none;align-items:center;justify-content:center;z-index:30;padding:16px}
     .modal{max-width:420px;width:100%;background:linear-gradient(180deg,#0e1e2a,#0a141d);border:1px solid var(--border);border-radius:16px;box-shadow:var(--shadow);padding:14px}
-    .modal h3{margin:4px 0 8px}
     .field{display:flex;align-items:center;justify-content:space-between;border:1px solid var(--border);background:#0c1822;border-radius:12px;padding:10px;margin:8px 0}
-    .field input{background:transparent;border:none;color:var(--text);text-align:right;width:90px;font-size:16px;outline:none}
-
-    .link{color:var(--accent)}
+    .field input, .field select{background:transparent;border:none;color:var(--text);text-align:right;width:120px;font-size:16px;outline:none}
   </style>
 </head>
 <body>
   <div class="app">
     <header>
-      <div class="title"><span style="font-size:20px">💧</span> Hydra <span class="badge">iPhone WebApp</span></div>
-      <div class="stats">
-        <span class="chip">Objectif: <b id="goalLbl">2000</b> ml</span>
-        <span class="chip">Aujourd’hui: <b id="todayLbl">0</b> ml</span>
-        <span class="chip">Restant: <b id="leftLbl">2000</b> ml</span>
-      </div>
+      <div class="title">💪 Abdos 30 jours <span class="badge">iPhone WebApp</span></div>
+      <div class="chip">Streak: <b id="streak">0</b> 🔥</div>
     </header>
 
     <main>
-      <section class="card bottleWrap">
-        <div class="bottle">
-          <!-- Bouteille (SVG) -->
-          <svg viewBox="0 0 300 500" aria-hidden="true">
-            <defs>
-              <linearGradient id="glassGrad" x1="0" x2="0" y1="0" y2="1">
-                <stop offset="0%" stop-color="#3be7ff" stop-opacity=".25"/>
-                <stop offset="50%" stop-color="#3be7ff" stop-opacity=".08"/>
-                <stop offset="100%" stop-color="#3be7ff" stop-opacity=".18"/>
-              </linearGradient>
-            </defs>
-            <path d="M110 30 h80 a12 12 0 0 1 12 12 v24 a12 12 0 0 1 -12 12 h-80 a12 12 0 0 1 -12 -12 v-24 a12 12 0 0 1 12 -12 z" fill="#0f2a36"/>
-            <path d="M80 78 h140 v14 a18 18 0 0 1 -18 18 h-104 a18 18 0 0 1 -18 -18 z" fill="#103144"/>
-            <path d="M70 110 q-22 40 -22 70 v240 q0 40 30 50 l60 18 q16 5 32 0 l60 -18 q30 -9 30 -50 V180 q0 -30 -22 -70 z" fill="url(#glassGrad)" stroke="#1c485e" stroke-width="2"/>
-          </svg>
-          <div class="water" id="water"></div>
-          <div class="surface" id="surface" style="--h:0px"></div>
+      <section class="panel">
+        <div class="row" style="margin-bottom:8px">
+          <div class="chip">Jour: <b id="dayLbl">1</b>/30</div>
+          <div class="chip">Difficulté: <b id="diffLbl">Normal</b></div>
+          <button class="btn" id="btnSettings">Réglages</button>
         </div>
+        <div class="calendar" id="cal"></div>
       </section>
 
-      <section class="card">
-        <div class="history" id="history"></div>
+      <section class="panel workout">
+        <div class="row">
+          <div style="font-weight:900">Séance du jour</div>
+          <div class="chip">Repos: <b id="restLbl">30</b>s</div>
+        </div>
+        <div id="list"></div>
+        <div class="timer">
+          <div class="clock"><div id="clock">00:30</div></div>
+          <div class="controls">
+            <button class="btn" id="btnStart">▶️ Démarrer</button>
+            <button class="btn" id="btnPause">⏸️ Pause</button>
+            <button class="btn" id="btnSkip">⏭️ Suivant</button>
+          </div>
+          <div class="hint">Le minuteur sert pour le repos entre les séries • Tu peux l'ajuster dans les réglages</div>
+        </div>
       </section>
     </main>
 
-    <nav class="dock">
-      <button class="round" id="btnMinus">−</button>
-      <button class="big" id="btnAdd">+ Ajouter <span id="cupLbl" style="font-size:14px;font-weight:700;color:var(--muted)">(250 ml)</span></button>
-      <button class="round" id="btnSettings">⚙︎</button>
+    <nav>
+      <button class="big" id="btnDone">✔️ Marquer le jour comme terminé</button>
     </nav>
   </div>
 
-  <!-- Modale Réglages -->
+  <!-- Réglages -->
   <div class="overlay" id="ov">
     <div class="modal">
-      <button class="link" id="btnClose" style="float:right">✕ Fermer</button>
+      <button class="btn" id="btnClose" style="float:right">✕</button>
       <h3>Réglages</h3>
-      <div class="field"><span>Taille d’un verre</span><input id="cupInput" type="number" step="50" min="50" value="250"> ml</div>
-      <div class="field"><span>Objectif quotidien</span><input id="goalInput" type="number" step="100" min="500" value="2000"> ml</div>
-      <div class="field"><span>Réinitialiser aujourd’hui</span><button class="link" id="btnReset">Remettre à 0</button></div>
-      <div class="field"><span>Exporter historique</span><button class="link" id="btnExport">JSON</button></div>
-      <div class="field"><span>Importer historique</span><button class="link" id="btnImport">JSON</button></div>
+      <div class="field"><span>Difficulté</span>
+        <select id="diffSel">
+          <option value="easy">Facile</option>
+          <option value="normal" selected>Normal</option>
+          <option value="hard">Difficile</option>
+        </select>
+      </div>
+      <div class="field"><span>Repos entre séries</span><input id="restInput" type="number" min="10" max="180" step="5" value="30"> s</div>
+      <div class="field"><span>Réinitialiser le programme</span><button class="btn" id="btnReset">Remettre à 0</button></div>
+      <div class="field"><span>Exporter progression</span><button class="btn" id="btnExport">JSON</button></div>
+      <div class="field"><span>Importer progression</span><button class="btn" id="btnImport">JSON</button></div>
     </div>
   </div>
 
@@ -126,100 +129,112 @@
 
 <script>
 // ===== Helpers
-const $ = s=>document.querySelector(s);
+const $=s=>document.querySelector(s);
+const fmt2 = n=> String(n).padStart(2,'0');
+function toast(msg){ const t=$('#toast'); t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),1200); }
 const todayKey = ()=> new Date().toISOString().slice(0,10);
-const fmt = new Intl.NumberFormat('fr-FR');
-function toast(m){ const t=$('#toast'); t.textContent=m; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),1100); }
-function clamp(v,a,b){ return Math.max(a,Math.min(b,v)); }
+
+// ===== Program model (base reps per day for Normal)
+const BASE = [
+  {name:'Crunchs', base:12},
+  {name:'Relevés de jambes', base:8},
+  {name:'Gainage (sec)', base:25, hold:true},
+  {name:'Bicycle crunch', base:10},
+  {name:'Mountain climbers', base:20}
+];
+
+// scale rules by day and difficulty
+function dayMultiplier(day){ // gentle ramp
+  return 0.8 + (day-1)*(0.2/9) * (day<=10?1: day<=20? 0.7:0.5); // fast first 10 days then slower
+}
+function diffMultiplier(diff){ return diff==='easy'?0.8 : diff==='hard'?1.25 : 1; }
 
 // ===== State
-const KEY='hydra.v1';
-let state = { goal:2000, cup:250, days:{} }; // days: { 'YYYY-MM-DD': amount_ml }
+const KEY='abs30.v1';
+let state = { day:1, diff:'normal', rest:30, done:{}, streak:0, lastDone:'' };
 
 function save(){ localStorage.setItem(KEY, JSON.stringify(state)); }
-function load(){ try{ const s=JSON.parse(localStorage.getItem(KEY)||'null'); if(s) state=s; }catch{} }
+function load(){ try{ const s=JSON.parse(localStorage.getItem(KEY)||'null'); if(s) state=s; }catch{}
+  if(state.day<1||state.day>30) state.day=1; state.done ||= {}; state.diff ||= 'normal'; state.rest ||= 30; state.streak ||= 0; state.lastDone ||= '';
+}
+load();
 
-// Seed
-load(); state.days ||= {}; state.goal ||= 2000; state.cup ||= 250;
-if(!state.days[todayKey()]) state.days[todayKey()] = 0;
-
-// ===== UI Update
-function setWaterLevel(){
-  const cur = state.days[todayKey()]||0; const r = clamp(cur/state.goal,0,1);
-  const bottle = document.querySelector('.bottle');
-  const water = $('#water');
-  const h = Math.round((bottle.clientHeight*0.70) * r); // ~70% of bottle height
-  water.style.height = h+'px';
-  $('#surface').style.setProperty('--h', h+'px');
-  $('#todayLbl').textContent = fmt.format(cur);
-  $('#goalLbl').textContent  = fmt.format(state.goal);
-  $('#leftLbl').textContent  = fmt.format(Math.max(0, state.goal-cur));
+// ===== Build daily plan
+function buildPlan(day){
+  const mult = dayMultiplier(day) * diffMultiplier(state.diff);
+  return BASE.map(x=> ({ name:x.name, reps: Math.max( (x.hold? Math.round(x.base*mult) : Math.round(x.base*mult)), x.hold?15:8 ), hold:!!x.hold, sets: day<=10? 3 : day<=20? 4 : 5 }));
 }
 
-function renderHistory(){
-  const wrap = $('#history'); wrap.innerHTML='';
-  const days = [];
-  const d0 = new Date();
-  for(let i=6;i>=0;i--){ const d=new Date(d0); d.setDate(d0.getDate()-i); const k=d.toISOString().slice(0,10); days.push(k); }
-  for(const k of days){
-    const v = state.days[k]||0; const r=clamp(v/state.goal,0,1);
-    const bar = document.createElement('div'); bar.className='bar';
-    const fill = document.createElement('div'); fill.style.height = Math.round(r*100)+'%';
-    const lab = document.createElement('label'); const dd = new Date(k); lab.textContent = dd.toLocaleDateString('fr-FR',{weekday:'short'}).replace('.','');
-    bar.appendChild(fill); bar.appendChild(lab); wrap.appendChild(bar);
+// ===== Calendar
+function renderCal(){
+  const cal=$('#cal'); cal.innerHTML='';
+  for(let i=1;i<=30;i++){
+    const d = document.createElement('div'); d.className='day'+(i===state.day?' today':'')+(state.done[i]?' done':'');
+    d.innerHTML = `<span>${i}</span><small>${state.done[i]? '✔️' : ''}</small>`;
+    d.onclick = ()=>{ state.day=i; renderAll(); save(); };
+    cal.appendChild(d);
   }
 }
 
-function spawnBubbles(){
-  const water = $('#water'); if(!water) return; for(let i=0;i<8;i++){
-    const b = document.createElement('div'); b.className='bubble';
-    b.style.left = (10 + Math.random()*80)+'%'; b.style.bottom='8px'; b.style.animationDuration = (3+Math.random()*2)+'s'; b.style.opacity = .5 + Math.random()*0.4;
-    water.appendChild(b); setTimeout(()=> b.remove(), 4500);
-  }
+// ===== Workout list
+let currentIndex=0; let timer=0; let running=false; let paused=false; let plan=buildPlan(state.day);
+function renderList(){
+  plan = buildPlan(state.day);
+  const list=$('#list'); list.innerHTML='';
+  plan.forEach((ex,idx)=>{
+    const row=document.createElement('div'); row.className='exercise';
+    const left=document.createElement('div'); left.innerHTML = `<div class="name">${ex.name}</div><div class="meta">${ex.sets} séries</div>`;
+    const right=document.createElement('div'); right.innerHTML = `<span class="goal">${ex.hold? ex.reps+'s' : ex.reps+' reps'}</span>`;
+    if(idx===currentIndex) row.style.outline='2px solid var(--accent)';
+    row.appendChild(left); row.appendChild(right); list.appendChild(row);
+  });
 }
 
-function confetti(){
-  const N=80; for(let i=0;i<N;i++){
-    const s=document.createElement('div'); s.style.position='fixed'; s.style.width='6px'; s.style.height='10px'; s.style.left=(Math.random()*100)+'%'; s.style.top='-10px'; s.style.background=`hsl(${Math.random()*200+160},90%,60%)`;
-    s.style.transform=`rotate(${Math.random()*360}deg)`; s.style.transition='transform 1.2s ease, top 1.2s ease, opacity 1.2s ease'; s.style.zIndex='9999'; document.body.appendChild(s);
-    const tx=(Math.random()*2-1)*120; const ty=window.innerHeight+20; const rot=(Math.random()*360);
-    requestAnimationFrame(()=>{ s.style.top=ty+'px'; s.style.transform=`translate(${tx}px,0) rotate(${rot}deg)`; s.style.opacity='0'; });
-    setTimeout(()=>s.remove(),1400);
-  }
+// ===== Timer (rest)
+function setClock(sec){ $('#clock').textContent = `${fmt2(Math.floor(sec/60))}:${fmt2(Math.floor(sec%60))}`; }
+setClock(state.rest);
+
+function start(){ if(running) return; running=true; paused=false; timer = state.rest; tick(); }
+function pause(){ paused=!paused; }
+function skip(){ timer=0; }
+
+function tick(){ if(!running) return; if(paused) { setTimeout(tick,250); return; }
+  setClock(timer); if(timer<=0){ nextExercise(); return; } timer -= 1; setTimeout(tick,1000); }
+
+function nextExercise(){
+  currentIndex++; if(currentIndex>=plan.length){
+    toast('Séance terminée — bravo !'); running=false; return; }
+  // after rest, highlight next
+  renderList(); timer = state.rest; tick();
 }
 
-function renderAll(){ setWaterLevel(); renderHistory(); $('#cupLbl').textContent = `(${state.cup} ml)`; }
+// ===== Mark day done
+function markDone(){
+  state.done[state.day]=true; // streak
+  const today = todayKey();
+  if(state.lastDone){ const prev = new Date(state.lastDone); const now = new Date(today); const diff = (now - prev)/(1000*3600*24);
+    if(diff<=1.1) state.streak++; else state.streak=1;
+  } else state.streak=1;
+  state.lastDone = today; save(); renderAll(); toast('Jour validé ✔️');
+  if(state.day<30) { state.day++; currentIndex=0; renderAll(); }
+}
 
-// ===== Actions
-function add(amount){ const k=todayKey(); state.days[k] = (state.days[k]||0) + amount; save(); renderAll(); spawnBubbles(); if(state.days[k]>=state.goal && (state.days[k]-amount)<state.goal){ toast('Objectif atteint ! 💧'); confetti(); } }
-function remove(amount){ const k=todayKey(); state.days[k] = clamp((state.days[k]||0) - amount, 0, 100000); save(); renderAll(); }
-function resetToday(){ const k=todayKey(); state.days[k]=0; save(); renderAll(); }
-
-// ===== Events
-$('#btnAdd').onclick = ()=> add(state.cup);
-$('#btnMinus').onclick = ()=> remove(state.cup);
+// ===== Settings
 $('#btnSettings').onclick = ()=> $('#ov').style.display='flex';
 $('#btnClose').onclick = ()=> $('#ov').style.display='none';
-$('#btnReset').onclick = ()=>{ if(confirm('Remettre à 0 la journée ?')) resetToday(); };
+$('#btnReset').onclick = ()=>{ if(confirm('Réinitialiser le programme ?')){ state.day=1; state.done={}; state.streak=0; state.lastDone=''; currentIndex=0; save(); renderAll(); } };
+$('#diffSel').value = state.diff; $('#diffSel').onchange = e=>{ state.diff=e.target.value; $('#diffLbl').textContent = e.target.options[e.target.selectedIndex].text; save(); renderAll(); };
+$('#restInput').value = state.rest; $('#restInput').onchange = e=>{ const v=Math.max(10, Math.min(180, +e.target.value||30)); state.rest=v; $('#restLbl').textContent=v; setClock(v); save(); };
 
-$('#cupInput').value = state.cup; $('#goalInput').value = state.goal;
-$('#cupInput').onchange = (e)=>{ const v=+e.target.value||250; state.cup = clamp(v,50,2000); save(); renderAll(); toast('Verre mis à jour'); };
-$('#goalInput').onchange = (e)=>{ const v=+e.target.value||2000; state.goal = clamp(v,500,10000); save(); renderAll(); toast('Objectif mis à jour'); };
+// Export/Import
+$('#btnExport').onclick = ()=>{ const blob=new Blob([JSON.stringify(state,null,2)],{type:'application/json'}); const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download='abdos30.json'; a.click(); URL.revokeObjectURL(url); };
+$('#btnImport').onclick = ()=>{ const inp=document.createElement('input'); inp.type='file'; inp.accept='.json,application/json'; inp.onchange=()=>{ const f=inp.files[0]; if(!f) return; const r=new FileReader(); r.onload=()=>{ try{ const s=JSON.parse(r.result); if(s && s.done && s.day){ state=s; save(); renderAll(); toast('Import réussi'); } }catch{ toast('Erreur import'); } }; r.readAsText(f); }; inp.click(); };
 
-// Export / Import
-$('#btnExport').onclick = ()=>{
-  const blob = new Blob([JSON.stringify(state,null,2)], {type:'application/json'});
-  const url = URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download='hydra.json'; a.click(); URL.revokeObjectURL(url);
-};
-$('#btnImport').onclick = ()=>{
-  const inp=document.createElement('input'); inp.type='file'; inp.accept='.json,application/json';
-  inp.onchange = ()=>{ const f=inp.files[0]; if(!f) return; const r=new FileReader(); r.onload=()=>{ try{ const s=JSON.parse(r.result); if(s && s.days && s.goal && s.cup){ state=s; save(); renderAll(); toast('Import réussi'); } else toast('Fichier invalide'); }catch{ toast('Erreur import'); } }; r.readAsText(f); };
-  inp.click();
-};
+// Buttons
+$('#btnStart').onclick = start; $('#btnPause').onclick = pause; $('#btnSkip').onclick = skip; $('#btnDone').onclick = markDone;
 
-// ===== Init
+function renderAll(){ $('#dayLbl').textContent=state.day; $('#restLbl').textContent=state.rest; $('#diffLbl').textContent = state.diff==='easy'?'Facile': state.diff==='hard'?'Difficile':'Normal'; $('#streak').textContent=state.streak; renderCal(); renderList(); setClock(state.rest); }
 renderAll();
-setInterval(spawnBubbles, 2500);
 </script>
 </body>
 </html>
